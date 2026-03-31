@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ficha de Treino — Push Pull Legs</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;700&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #f5f4f0;
+    --card: #ffffff;
+    --text: #1a1a18;
+    --muted: #6b6b67;
+    --hint: #9a9896;
+    --border: rgba(0,0,0,0.1);
+    --border-md: rgba(0,0,0,0.2);
+    --surf: #eeede9;
+    --radius: 12px;
+    --radius-sm: 8px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #111110;
+      --card: #1e1e1c;
+      --text: #f0ede6;
+      --muted: #9a9892;
+      --hint: #6b6b67;
+      --border: rgba(255,255,255,0.09);
+      --border-md: rgba(255,255,255,0.18);
+      --surf: #2a2a28;
+    }
+  }
+  body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; padding: 1.5rem 1rem 4rem; }
+  .wrap { max-width: 600px; margin: 0 auto; }
+  .top { text-align: center; margin-bottom: 1.5rem; }
+  .ttl { font-family: 'Syne', sans-serif; font-size: 24px; font-weight: 700; letter-spacing: -0.4px; }
+  .sub { font-size: 13px; color: var(--muted); margin-top: 3px; }
+  .prog-bar { background: var(--surf); border-radius: 99px; height: 7px; margin: 0.875rem 0 0.25rem; border: 0.5px solid var(--border); overflow: hidden; }
+  .prog-fill { height: 100%; background: #1D9E75; border-radius: 99px; transition: width 0.4s; }
+  .prog-lbl { font-size: 11px; color: var(--muted); text-align: right; }
+  .main-tabs { display: flex; gap: 0; margin-bottom: 1.25rem; border-bottom: 0.5px solid var(--border-md); }
+  .main-tab { flex: 1; padding: 10px 4px; font-size: 14px; font-weight: 500; background: transparent; border: none; border-bottom: 2px solid transparent; cursor: pointer; color: var(--muted); transition: all 0.2s; font-family: 'DM Sans', sans-serif; }
+  .main-tab.active { color: #1D9E75; border-bottom-color: #1D9E75; }
+  .section { display: none; }
+  .section.visible { display: block; }
+  .day-tabs { display: flex; gap: 7px; overflow-x: auto; padding-bottom: 4px; margin-bottom: 1rem; scrollbar-width: none; }
+  .day-tabs::-webkit-scrollbar { display: none; }
+  .day-btn { flex: 0 0 auto; padding: 6px 15px; border-radius: 99px; border: 0.5px solid var(--border-md); background: var(--card); font-family: 'DM Sans', sans-serif; font-size: 13px; cursor: pointer; color: var(--muted); transition: all 0.2s; white-space: nowrap; }
+  .day-btn.active { background: #1D9E75; border-color: #0F6E56; color: #fff; font-weight: 500; }
+  .day-btn.done-day { border-color: #5DCAA5; color: #0F6E56; }
+  .card { background: var(--card); border: 0.5px solid var(--border); border-radius: var(--radius); overflow: hidden; margin-bottom: 1rem; }
+  .card-head { padding: 0.875rem 1.25rem 0.75rem; display: flex; align-items: center; gap: 12px; border-bottom: 0.5px solid var(--border); }
+  .day-icon { width: 48px; height: 48px; border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .card-info { flex: 1; }
+  .day-name { font-size: 15px; font-weight: 500; }
+  .day-tag { font-size: 10px; font-weight: 400; color: var(--muted); }
+  .day-muscles { font-size: 12px; color: var(--muted); margin-top: 2px; }
+  .day-rest { font-size: 10px; color: var(--hint); margin-top: 2px; }
+  .badge { font-size: 11px; padding: 3px 10px; border-radius: 99px; font-weight: 500; white-space: nowrap; }
+  .badge.complete { background: #E1F5EE; color: #0F6E56; }
+  .badge.partial { background: #FAEEDA; color: #854F0B; }
+  .badge.empty { background: var(--surf); color: var(--muted); }
+  .ex-list { padding: 0.25rem 0; }
+  .ex-row { display: flex; align-items: center; gap: 10px; padding: 10px 1.25rem; border-bottom: 0.5px solid var(--border); transition: background 0.15s; }
+  .ex-row:last-child { border-bottom: none; }
+  .ex-row:hover { background: var(--surf); }
+  .ex-row.done { opacity: 0.5; }
+  .chk-btn { width: 26px; height: 26px; border-radius: 50%; border: 1.5px solid var(--border-md); background: transparent; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.2s; color: transparent; }
+  .chk-btn.checked { background: #1D9E75; border-color: #0F6E56; color: #fff; }
+  .ex-info { flex: 1; min-width: 0; }
+  .ex-name { font-size: 14px; font-weight: 500; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .ex-name.done-text { text-decoration: line-through; color: var(--muted); }
+  .ex-meta { font-size: 12px; color: var(--muted); margin-top: 1px; }
+  .ex-tag { font-size: 11px; padding: 2px 8px; border-radius: 6px; background: var(--surf); color: var(--muted); white-space: nowrap; flex-shrink: 0; }
+  .reset-btn { display: block; width: calc(100% - 2.5rem); margin: 0 1.25rem 0.875rem; padding: 9px; border-radius: var(--radius-sm); border: 0.5px solid var(--border-md); background: transparent; font-family: 'DM Sans', sans-serif; font-size: 13px; color: var(--muted); cursor: pointer; transition: all 0.2s; }
+  .reset-btn:hover { background: var(--surf); color: var(--text); }
+  .info-block { background: var(--card); border: 0.5px solid var(--border); border-radius: var(--radius); padding: 1rem 1.25rem; margin-bottom: 0.875rem; }
+  .info-block h3 { font-size: 15px; font-weight: 500; margin-bottom: 0.75rem; }
+  .tip-row { display: flex; gap: 10px; align-items: flex-start; padding: 8px 0; border-bottom: 0.5px solid var(--border); }
+  .tip-row:last-child { border-bottom: none; }
+  .tip-icon { width: 30px; height: 30px; border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .tip-title { font-size: 13px; font-weight: 500; }
+  .tip-desc { font-size: 12px; color: var(--muted); margin-top: 2px; line-height: 1.55; }
+  .warn-block { background: #FCEBEB; border-radius: var(--radius-sm); padding: 0.875rem 1rem; margin-top: 0.75rem; }
+  .warn-title { font-size: 13px; font-weight: 500; color: #A32D2D; margin-bottom: 6px; }
+  .warn-item { font-size: 13px; color: #791F1F; line-height: 1.7; }
+  .dica-list { list-style: none; padding: 0; }
+  .dica-list li { font-size: 13px; color: var(--muted); line-height: 1.7; padding-left: 1rem; position: relative; }
+  .dica-list li::before { content: "–"; position: absolute; left: 0; color: var(--hint); }
+  .meal-card { background: var(--card); border: 0.5px solid var(--border); border-radius: var(--radius); overflow: hidden; margin-bottom: 0.75rem; }
+  .meal-head { display: flex; align-items: center; gap: 10px; padding: 0.75rem 1rem; border-bottom: 0.5px solid var(--border); }
+  .meal-time { font-size: 13px; font-weight: 500; }
+  .meal-label { font-size: 11px; color: var(--muted); margin-top: 1px; }
+  .meal-body { padding: 0.75rem 1rem; }
+  .meal-item { font-size: 13px; color: var(--muted); line-height: 1.65; }
+  .meal-tip { font-size: 11px; color: #0F6E56; background: #E1F5EE; border-radius: 6px; padding: 4px 9px; margin-top: 7px; display: inline-block; }
+  .tdot { width: 34px; height: 34px; border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 11px; font-weight: 500; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <div class="ttl">Ficha de Treino</div>
+    <div class="sub">Push Pull Legs — 5 dias por semana</div>
+    <div class="prog-bar"><div class="prog-fill" id="gFill" style="width:0%"></div></div>
+    <div class="prog-lbl" id="gLbl">0 de 0 exercícios concluídos</div>
+  </div>
+
+  <div class="main-tabs">
+    <button class="main-tab active" onclick="showSec('treino',this)">Treino</button>
+    <button class="main-tab" onclick="showSec('instrucoes',this)">Instruções</button>
+    <button class="main-tab" onclick="showSec('dieta',this)">Dieta</button>
+  </div>
+
+  <div id="sec-treino" class="section visible">
+    <div class="day-tabs" id="dayTabs"></div>
+    <div id="dayContent"></div>
+  </div>
+
+  <div id="sec-instrucoes" class="section">
+    <div class="info-block">
+      <h3>Como fazer séries e repetições</h3>
+      <div class="tip-row">
+        <div class="tip-icon" style="background:#E1F5EE;">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6" stroke="#1D9E75" stroke-width="1.5"/><path d="M8 5v3l2 2" stroke="#1D9E75" stroke-width="1.5" stroke-linecap="round"/></svg>
+        </div>
+        <div>
+          <div class="tip-title">Regra principal de carga</div>
+          <div class="tip-desc">Fez o máximo de reps com facilidade? Aumente o peso. Não alcançou o mínimo? Reduza a carga.</div>
+        </div>
+      </div>
+      <div class="tip-row">
+        <div class="tip-icon" style="background:#FAEEDA;">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 2l1.5 3.5 3.5.5-2.5 2.5.5 3.5L8 10.5 5 12l.5-3.5L3 6l3.5-.5L8 2z" stroke="#BA7517" stroke-width="1.5" stroke-linejoin="round"/></svg>
+        </div>
+        <div>
+          <div class="tip-title">Exemplo prático</div>
+          <div class="tip-desc">8–12 reps: conseguiu 12 → sobe carga. Fez só 6 → carga está alta demais.</div>
+        </div>
+      </div>
+      <div class="tip-row">
+        <div class="tip-icon" style="background:#E6F1FB;">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M4 12l4-8 4 8" stroke="#185FA5" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M5.5 9.5h5" stroke="#185FA5" stroke-width="1.5" stroke-linecap="round"/></svg>
+        </div>
+        <div>
+          <div class="tip-title">Intensidade ideal (RIR)</div>
+          <div class="tip-desc">Sempre deixe 1–2 repetições na reserva. Não precisa ir até a falha em tudo.</div>
+        </div>
+      </div>
+      <div class="tip-row">
+        <div class="tip-icon" style="background:#EAF3DE;">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 13l3-6 3 4 2-3 2 5" stroke="#3B6D11" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div>
+          <div class="tip-title">Progressão semanal (essencial)</div>
+          <div class="tip-desc">Toda semana tente +1 repetição OU +1–2 kg. Isso é o que gera hipertrofia de verdade.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="info-block">
+      <h3>Dicas para ectomorfo</h3>
+      <ul class="dica-list">
+        <li>Comer mais calorias (superávit calórico)</li>
+        <li>Proteína: ~2g por kg de peso (aprox. 110g/dia)</li>
+        <li>Carboidrato alto: arroz, massa, batata doce</li>
+        <li>Dormir bem: 7–9 horas por noite</li>
+      </ul>
+      <div style="font-size:12px; color:var(--hint); margin-top:10px;">Sem alimentação e sono adequados, o treino não vai funcionar.</div>
+    </div>
+
+    <div class="warn-block">
+      <div class="warn-title">Erros que você deve evitar</div>
+      <div class="warn-item">– Treinar leve demais</div>
+      <div class="warn-item">– Fazer muito cardio</div>
+      <div class="warn-item">– Pular refeições</div>
+      <div class="warn-item">– Treinar até a falha em tudo (vai te destruir)</div>
+    </div>
+  </div>
+
+  <div id="sec-dieta" class="section">
+    <div class="meal-card">
+      <div class="meal-head">
+        <div class="tdot" style="background:#FAEEDA; color:#854F0B;">06h</div>
+        <div><div class="meal-time">Café da manhã</div><div class="meal-label">Melhorar esta refeição</div></div>
+      </div>
+      <div class="meal-body">
+        <div class="meal-item">2 pães · 2 ovos · 1 banana · 1 copo de leite</div>
+        <span class="meal-tip">Mais calorias + proteína + energia</span>
+      </div>
+    </div>
+    <div class="meal-card">
+      <div class="meal-head">
+        <div class="tdot" style="background:#E6F1FB; color:#185FA5;">09h</div>
+        <div><div class="meal-time">Lanche da manhã</div><div class="meal-label">Adicione — você não come nada aqui</div></div>
+      </div>
+      <div class="meal-body">
+        <div class="meal-item">1 banana + aveia</div>
+        <div class="meal-item" style="margin-top:4px;">ou pão com pasta de amendoim</div>
+      </div>
+    </div>
+    <div class="meal-card">
+      <div class="meal-head">
+        <div class="tdot" style="background:#E1F5EE; color:#0F6E56;">12h</div>
+        <div><div class="meal-time">Almoço</div><div class="meal-label">Manter e caprichar na quantidade</div></div>
+      </div>
+      <div class="meal-body">
+        <div class="meal-item">Arroz · Feijão · Carne (frango, moída ou ovo) · Salada</div>
+        <span class="meal-tip">Sem medo de comer — quantidade importa aqui</span>
+      </div>
+    </div>
+    <div class="meal-card">
+      <div class="meal-head">
+        <div class="tdot" style="background:#FAEEDA; color:#854F0B;">15h</div>
+        <div><div class="meal-time">Lanche da tarde</div><div class="meal-label">Trocar bolacha por algo melhor</div></div>
+      </div>
+      <div class="meal-body">
+        <div class="meal-item">Pão com ovo · ou pão com frango desfiado · ou iogurte + aveia</div>
+      </div>
+    </div>
+    <div class="meal-card">
+      <div class="meal-head">
+        <div class="tdot" style="background:#FCEBEB; color:#A32D2D;">17h</div>
+        <div><div class="meal-time">Treino</div><div class="meal-label">17h–18h</div></div>
+      </div>
+      <div class="meal-body">
+        <div class="meal-item">Pós-treino: hipercalórico + 1 banana + aveia (se possível)</div>
+        <span class="meal-tip">Você já faz — continue e melhore</span>
+      </div>
+    </div>
+    <div class="meal-card">
+      <div class="meal-head">
+        <div class="tdot" style="background:#E1F5EE; color:#0F6E56;">19h</div>
+        <div><div class="meal-time">Jantar</div><div class="meal-label">Melhorar muito — essencial para crescer</div></div>
+      </div>
+      <div class="meal-body">
+        <div class="meal-item">Arroz · Feijão · Carne / Frango / Ovos</div>
+        <span class="meal-tip">Esta refeição é essencial para crescer</span>
+      </div>
+    </div>
+    <div class="meal-card">
+      <div class="meal-head">
+        <div class="tdot" style="background:#E6F1FB; color:#185FA5;">22h</div>
+        <div><div class="meal-time">Ceia</div><div class="meal-label">Continue comendo, mas melhore</div></div>
+      </div>
+      <div class="meal-body">
+        <div class="meal-item">2 ovos · ou leite + aveia · ou pão com pasta de amendoim</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const DAYS = [
+  {
+    id:0, short:"Seg", label:"Segunda-feira", muscles:"Peito · Ombro · Tríceps", tag:"PUSH", rest:"Descanso: 60–90s (até 2min no supino)",
+    color:"#FCEBEB",
+    icon:`<svg width="26" height="26" viewBox="0 0 26 26" fill="none"><ellipse cx="13" cy="9" rx="7" ry="4.5" fill="#F09595"/><rect x="5" y="12" width="5" height="8" rx="2" fill="#E24B4A"/><rect x="16" y="12" width="5" height="8" rx="2" fill="#E24B4A"/><rect x="10" y="10" width="6" height="3" rx="1" fill="#A32D2D"/></svg>`,
+    exercises:[
+      {name:"Supino reto",sets:"4",reps:"6–10",focus:"Peito"},
+      {name:"Supino inclinado c/ halter",sets:"3",reps:"8–12",focus:"Peito"},
+      {name:"Desenvolvimento (ombro)",sets:"3",reps:"6–10",focus:"Ombro"},
+      {name:"Elevação lateral",sets:"3",reps:"12–15",focus:"Ombro"},
+      {name:"Tríceps corda",sets:"3",reps:"10–15",focus:"Tríceps"},
+      {name:"Tríceps testa",sets:"2–3",reps:"8–12",focus:"Tríceps"},
+    ]
+  },
+  {
+    id:1, short:"Ter", label:"Terça-feira", muscles:"Costas · Bíceps", tag:"PULL", rest:"Descanso: 60–90s",
+    color:"#E6F1FB",
+    icon:`<svg width="26" height="26" viewBox="0 0 26 26" fill="none"><rect x="8" y="3" width="10" height="14" rx="3" fill="#85B7EB"/><rect x="9" y="5" width="3" height="10" rx="1.5" fill="#185FA5"/><rect x="14" y="5" width="3" height="10" rx="1.5" fill="#185FA5"/><ellipse cx="13" cy="19" rx="5" ry="3" fill="#378ADD"/></svg>`,
+    exercises:[
+      {name:"Barra fixa ou puxada",sets:"4",reps:"6–10",focus:"Costas"},
+      {name:"Remada curvada",sets:"3",reps:"8–12",focus:"Costas"},
+      {name:"Remada baixa",sets:"3",reps:"10–12",focus:"Costas"},
+      {name:"Face pull",sets:"3",reps:"12–15",focus:"Costas"},
+      {name:"Rosca direta",sets:"3",reps:"8–12",focus:"Bíceps"},
+      {name:"Rosca martelo",sets:"2–3",reps:"10–12",focus:"Bíceps"},
+    ]
+  },
+  {
+    id:2, short:"Qua", label:"Quarta-feira", muscles:"Pernas completo", tag:"LEGS", rest:"Descanso: 2min nos compostos",
+    color:"#E1F5EE",
+    icon:`<svg width="26" height="26" viewBox="0 0 26 26" fill="none"><ellipse cx="13" cy="7" rx="5" ry="3" fill="#5DCAA5"/><rect x="8" y="9" width="4" height="12" rx="2" fill="#1D9E75"/><rect x="14" y="9" width="4" height="12" rx="2" fill="#1D9E75"/><ellipse cx="13" cy="21" rx="6" ry="2" fill="#9FE1CB"/></svg>`,
+    exercises:[
+      {name:"Agachamento livre",sets:"4",reps:"6–10",focus:"Quad"},
+      {name:"Leg press",sets:"3",reps:"8–12",focus:"Quad"},
+      {name:"Cadeira extensora",sets:"3",reps:"10–15",focus:"Quad"},
+      {name:"Mesa flexora",sets:"3",reps:"10–15",focus:"Posterior"},
+      {name:"Panturrilha em pé",sets:"4",reps:"12–15",focus:"Panturrilha"},
+    ]
+  },
+  {
+    id:3, short:"Qui", label:"Quinta-feira", muscles:"Superior geral", tag:"UPPER", rest:"Descanso: 60–90s",
+    color:"#FAEEDA",
+    icon:`<svg width="26" height="26" viewBox="0 0 26 26" fill="none"><circle cx="13" cy="7" r="4" fill="#FAC775"/><path d="M5 21 Q13 13 21 21" stroke="#EF9F27" stroke-width="2.5" fill="none" stroke-linecap="round"/><rect x="10" y="11" width="6" height="7" rx="2" fill="#BA7517"/></svg>`,
+    exercises:[
+      {name:"Supino reto",sets:"3",reps:"8–10",focus:"Peito"},
+      {name:"Puxada na frente",sets:"3",reps:"8–12",focus:"Costas"},
+      {name:"Remada máquina",sets:"3",reps:"10–12",focus:"Costas"},
+      {name:"Elevação lateral",sets:"3",reps:"12–15",focus:"Ombro"},
+      {name:"Rosca direta",sets:"2–3",reps:"10–12",focus:"Bíceps"},
+      {name:"Tríceps corda",sets:"2–3",reps:"10–12",focus:"Tríceps"},
+    ]
+  },
+  {
+    id:4, short:"Sex", label:"Sexta-feira", muscles:"Posterior · Força", tag:"LOWER", rest:"Descanso: 2min nos compostos",
+    color:"#EEEDFE",
+    icon:`<svg width="26" height="26" viewBox="0 0 26 26" fill="none"><rect x="7" y="5" width="12" height="8" rx="3" fill="#AFA9EC"/><rect x="8" y="12" width="4" height="10" rx="2" fill="#7F77DD"/><rect x="14" y="12" width="4" height="10" rx="2" fill="#7F77DD"/><rect x="6" y="20" width="6" height="3" rx="1.5" fill="#534AB7"/><rect x="14" y="20" width="6" height="3" rx="1.5" fill="#534AB7"/></svg>`,
+    exercises:[
+      {name:"Levantamento terra",sets:"3",reps:"5–8",focus:"Posterior"},
+      {name:"Agachamento (leve/mod.)",sets:"3",reps:"8–10",focus:"Quad"},
+      {name:"Mesa flexora",sets:"3",reps:"10–12",focus:"Posterior"},
+      {name:"Afundo (passada)",sets:"3",reps:"10–12 cada",focus:"Glúteo"},
+      {name:"Panturrilha",sets:"4",reps:"12–15",focus:"Panturrilha"},
+    ]
+  }
+];
+
+const SKEY = 'ficha_ppl_checked';
+const state = { activeDay: 0, checked: {} };
+function loadState() { try { const s = localStorage.getItem(SKEY); if (s) state.checked = JSON.parse(s); else initC(); } catch(e) { initC(); } }
+function initC() { DAYS.forEach(d => d.exercises.forEach((_,i) => { state.checked[d.id+'-'+i] = false; })); }
+function save() { try { localStorage.setItem(SKEY, JSON.stringify(state.checked)); } catch(e) {} }
+function countDone(id) { return DAYS[id].exercises.filter((_,i) => state.checked[id+'-'+i]).length; }
+function totalDone() { return Object.values(state.checked).filter(Boolean).length; }
+function totalEx() { return DAYS.reduce((s,d) => s+d.exercises.length, 0); }
+function getBadge(id) {
+  const t = DAYS[id].exercises.length, d = countDone(id);
+  if (!d) return {cls:'empty', txt:'0/'+t};
+  if (d===t) return {cls:'complete', txt:'Concluído ✓'};
+  return {cls:'partial', txt:d+'/'+t};
+}
+function showSec(name, btn) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('visible'));
+  document.querySelectorAll('.main-tab').forEach(b => b.classList.remove('active'));
+  document.getElementById('sec-'+name).classList.add('visible');
+  btn.classList.add('active');
+}
+function renderTabs() {
+  document.getElementById('dayTabs').innerHTML = DAYS.map(d => {
+    const done = countDone(d.id) === d.exercises.length;
+    const act = d.id === state.activeDay;
+    return `<button class="day-btn ${act?'active':(done?'done-day':'')}" onclick="selectDay(${d.id})">${d.short}${done&&!act?' ✓':''}</button>`;
+  }).join('');
+}
+const chkSVG = `<svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+function renderContent() {
+  const d = DAYS[state.activeDay];
+  const badge = getBadge(d.id);
+  const rem = d.exercises.filter((_,i) => !state.checked[d.id+'-'+i]);
+  const done = d.exercises.filter((_,i) => state.checked[d.id+'-'+i]);
+  let rows = '';
+  rem.forEach(ex => {
+    const gi = d.exercises.indexOf(ex);
+    rows += `<div class="ex-row"><button class="chk-btn" onclick="toggle(${d.id},${gi})">${chkSVG}</button><div class="ex-info"><div class="ex-name">${ex.name}</div><div class="ex-meta">${ex.sets} séries × ${ex.reps} reps</div></div><span class="ex-tag">${ex.focus}</span></div>`;
+  });
+  done.forEach(ex => {
+    const gi = d.exercises.indexOf(ex);
+    rows += `<div class="ex-row done"><button class="chk-btn checked" onclick="toggle(${d.id},${gi})">${chkSVG}</button><div class="ex-info"><div class="ex-name done-text">${ex.name}</div><div class="ex-meta">${ex.sets} séries × ${ex.reps} reps</div></div><span class="ex-tag">${ex.focus}</span></div>`;
+  });
+  document.getElementById('dayContent').innerHTML = `
+    <div class="card">
+      <div class="card-head">
+        <div class="day-icon" style="background:${d.color}">${d.icon}</div>
+        <div class="card-info">
+          <div class="day-name">${d.label} <span class="day-tag">${d.tag}</span></div>
+          <div class="day-muscles">${d.muscles}</div>
+          <div class="day-rest">${d.rest}</div>
+        </div>
+        <span class="badge ${badge.cls}">${badge.txt}</span>
+      </div>
+      <div class="ex-list">${rows}</div>
+      ${countDone(d.id)>0?`<button class="reset-btn" onclick="resetDay(${d.id})">Resetar treino do dia</button>`:''}
+    </div>`;
+  const t = totalEx(), c = totalDone();
+  document.getElementById('gFill').style.width = (t>0?c/t*100:0)+'%';
+  document.getElementById('gLbl').textContent = c+' de '+t+' exercícios concluídos';
+}
+function selectDay(id) { state.activeDay = id; renderTabs(); renderContent(); }
+function toggle(dayId, exIdx) { state.checked[dayId+'-'+exIdx]=!state.checked[dayId+'-'+exIdx]; save(); renderTabs(); renderContent(); }
+function resetDay(dayId) { DAYS[dayId].exercises.forEach((_,i) => { state.checked[dayId+'-'+i]=false; }); save(); renderTabs(); renderContent(); }
+loadState(); renderTabs(); renderContent();
+</script>
+</body>
+</html>
